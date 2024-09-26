@@ -1,6 +1,6 @@
 NEXUSstudio is an extension of NEXUS platform, designed to contribute in content creation using AI tools.
 
-#OVERVIEW 👇
+# OVERVIEW 👇
 
 ![1](https://github.com/user-attachments/assets/6df0d661-5293-433b-86f9-b6b44a61f8c9)
 ![21](https://github.com/user-attachments/assets/8beb29e3-91d6-4b90-a793-bf7fb352caa9)
