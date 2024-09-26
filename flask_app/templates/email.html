@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Generator</title>
+    <link rel="stylesheet" href="../static/css/email.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="left-section">
+                <div class="dots-icon" onclick="toggleSidebar()">
+                    <i class="fa-solid fa-bars"></i>
+                </div>
+                <div class="navbar-brand">
+                    <a href="/home" style="text-decoration:none; color:white; font-weight:800;"><h1>NEXUS <span style="font-weight: 700; font-size:0.9rem;">studio</span></h1></a>
+                </div>
+            </div>
+            <div class="right-section">
+                <div class="bell-icon" onclick="toggleNotifications()">
+                    <i class="fa-regular fa-bell"></i>
+                </div>
+                <div class="upgrade">
+                    <a href="#" class="nav-link">Upgrade</a>
+                </div>
+                <div class="user-profile luki">
+                    <div class="user-icon" onclick="toggleDropdown()">
+                        {{ session['user_initials'] }}
+                    </div>
+                    <div class="dropdown" id="dropdownMenu">
+                        <a href="#" class="dropdown-link">Settings</a>
+                        <a href="/logout" class="dropdown-link">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="sub-navbar">
+        <div class="sub-nav-container">
+            <div class="sub-nav-item">
+                <p style="color:rgb(46, 96, 224);">Save</p>
+                <i class="fas fa-file-alt" style="margin-left:20px; color:gray;"></i>
+            </div>
+            <div class="sub-nav-item">
+                <p>Parameters</p>
+                <i class="fas fa-cogs" style="margin-left:20px; color:gray;"></i>
+            </div>
+        </div>
+    </nav>
+   
+    <div class="main-content">
+        <aside class="sidebar-left">
+            <ul>
+                <li><a href="/generate-content" onclick="showForm('report-form')">Reports</a></li>
+                <li class="active"><a href="/emails/generate-emails" onclick="showForm('email-form')">Email</a></li>
+                <li><a href="/social-posts" onclick="showForm('social-post-form')">Posts</a></li>
+            </ul>
+        </aside>
+
+        <div class="email-preview">
+            <h2>Generated Email:</h2>
+            <pre id="emailOutput"></pre>
+        </div>
+
+        <div class="sidebar">
+            <h2>Parameters</h2>
+            <form id="emailForm">
+                <label for="context">Context:</label>
+                <textarea id="context" name="context" rows="4" required></textarea>
+                <label for="tone">Tone:</label>
+                <select id="tone" name="tone" required>
+                    <option value="formal">Formal</option>
+                    <option value="informal">Informal</option>
+                    <option value="persuasive">Persuasive</option>
+                </select>
+                <label for="audience">Audience:</label>
+                <input type="text" id="audience" name="audience" placeholder="Target Audience" required>
+                <label for="purpose">Purpose:</label>
+                <input type="text" id="purpose" name="purpose" placeholder="Purpose of the Email" required>
+                <button type="submit">Generate Email</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('emailForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const context = document.getElementById('context').value;
+            const tone = document.getElementById('tone').value;
+            const audience = document.getElementById('audience').value;
+            const purpose = document.getElementById('purpose').value;
+            const response = await fetch('/emails/generate_email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    context: context,
+                    tone: tone,
+                    audience: audience,
+                    purpose: purpose
+                })
+            }); 
+            const result = await response.json();
+            document.getElementById('emailOutput').textContent = result.generated_email;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus - Generate Content</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&family=SUSE:wght@100..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Encode+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/generate_content.css') }}">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="left-section">
+                <div class="dots-icon" onclick="toggleSidebar()">
+                    <i class="fa-solid fa-bars"></i>
+                </div>
+                <div class="navbar-brand">
+                    <h1>NEXUS <span style="font-weight: 700; font-size:0.9rem;"> studio</span></h1>
+                </div>
+            </div>
+            <div class="right-section">
+                <div class="bell-icon" onclick="toggleNotifications()">
+                    <i class="fa-regular fa-bell"></i>
+                </div>
+                <div class="upgrade">
+                    <a href="#" class="nav-link">Upgrade</a>
+                </div>
+                <div class="user-profile luki">
+                    <div class="user-icon" onclick="toggleDropdown()">
+                        {{ session['user_initials'] }}
+                    </div>
+                    <div class="dropdown" id="dropdownMenu">
+                        <a href="#" class="dropdown-link">Settings</a>
+                        <a href="/logout" class="dropdown-link">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <nav class="sub-navbar">
+        <div class="sub-nav-container">
+            <div class="sub-nav-item">
+                <p style="color:rgb(46, 96, 224);">Save</p>
+                <i class="fas fa-file-alt" style="margin-left:20px; color:gray;"></i>
+            </div>
+            <div class="sub-nav-item">
+                <p>Parameters</p>
+                <i class="fas fa-cogs" style="margin-left:20px; color:gray;"></i>
+            </div>
+        </div>
+    </nav>
+    <div class="main-container">
+        <aside class="sidebar-left">
+            <ul>
+                <li class="active" onclick="showForm('report-form')">Reports</li>
+<a href="/emails/generate-emails"><li onclick="showForm('email-form')">Email</li></a>
+                <li onclick="showForm('social-post-form')">Posts</li>
+            </ul>
+        </aside>
+
+        <div class="content">
+            <h1></h1>
+
+            <div id="report-form" class="form-section active">
+                <div id="setup-toggle" style="display: flex; align-items: center; cursor: pointer;">
+                    <h2 style="font-family: 'Encode Sans', sans-serif; font-weight: 300; font-size: 1.3rem; color: rgb(0, 0, 0); margin: 0;">Setup</h2>
+                    <i class="fa-sharp fa-solid fa-caret-down fa-xl" id="toggle-icon" style="color: #000000; margin-left: 10px;"></i>
+                </div>
+                <form id="instruction-form" style="margin-top: 1rem;">
+                    <div id="instruction-vend">
+                        <label for="instructions" style="font-size: 0.8rem; color: gray; font-family:'SUSE';font-weight:400;">Instruction (optional):</label>
+                        <input id="instructions" name="instructions" rows="1" placeholder="Tell the model what to do. For example: Generate a report.">
+                    </div>
+            
+                    <div class="content-table">
+                        <label for="content-input" style="font-size: 0.8rem; color: gray; font-family:'SUSE';font-weight:400;">Generate your content:</label>
+                        <div class="table-row">
+                            <div class="table-cell" style="background-color: #f4f4f4;">
+                                <label for="user-input" style="height:20px;"><h3 style="font-family:SUSE; font-weight:700; height:20px; font-size:0.9rem; color:#000000;">Input: </h3></label>
+                            </div>
+                            <div class="table-cell" style="background-color: #f4f4f4">
+                                <label for="content-output" style="height:20px;"><h3 style="font-family:SUSE; font-weight:700; height:20px; font-size:0.9rem; color:black;">Output: </h3></label>
+                            </div>
+                        </div>
+                        <div class="table-row">
+                            <div class="table-cell" style="padding:3px 0px !important;">
+                                <textarea id="user-input" name="user-input" rows="1" placeholder="Enter content or instruction"></textarea>
+                            </div>
+                            <div class="table-cell" style="padding:3px 0px !important;">
+                                <textarea id="content-output" name="content-output" rows="1" placeholder="Generated content will appear here" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <!-- Download Report Button -->
+                <button id="download-report" class="btn btn-primary mt-3" disabled>Download Report</button>
+            </div>
+        </div>
+
+        <div class="button-navbar">
+            <ul>
+                <li id="clear-output">
+                    Clear Output 
+                    <i class="fa-solid fa-arrow-rotate-left"></i>
+                </li>
+                <li id="generate">
+                    Generate 
+                    <i class="fa-solid fa-arrow-right"></i>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Right Sidebar -->
+        <aside class="sidebar-right">
+            <h2>Model Parameters</h2>
+            <form id="parameters-form">
+                <label for="tone">Tone:</label>
+                <select id="tone" name="tone">
+                    <option value="formal">Formal</option>
+                    <option value="informal">Informal</option>
+                    <option value="neutral">Neutral</option>
+                    <option value="technical">Technical</option>
+                    <option value="creative">Creative</option>
+                </select>
+
+                <label for="length">Length (Pages):</label>
+                <input type="number" id="length" name="length" min="1" max="10" value="1" placeholder="Number of pages">
+
+                <label for="industry">Industry:</label>
+                <input type="text" id="industry" name="industry" placeholder="e.g., Technology, Healthcare">
+
+                <label for="audience">Audience:</label>
+                <input type="text" id="audience" name="audience" placeholder="e.g., Executives, Customers">
+                <label for="format">Output Format:</label>
+                <select id="format" name="format">
+                    <option value="docx">DOCX</option>
+                    <option value="pdf">PDF</option>
+                </select>
+            </form>
+        </aside>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        function toggleDropdown() {
+            document.getElementById('dropdownMenu').classList.toggle('show');
+        }
+
+        function toggleNotifications() {
+            alert('Notifications panel toggled.');
+        }
+
+        function toggleSidebar() {
+            document.querySelector('.sidebar-left').classList.toggle('active');
+        }
+
+        function showForm(formId) {
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(formId).classList.add('active');
+
+            document.querySelectorAll('.sidebar-left ul li').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`.sidebar-left ul li[onclick="showForm('${formId}')"]`).classList.add('active');
+        }
+
+        document.getElementById('generate').addEventListener('click', function () {
+            const instructions = document.getElementById('instructions').value; // Correctly reference the instructions
+            const tone = document.getElementById('tone').value;
+            const length = document.getElementById('length').value;
+            const industry = document.getElementById('industry').value;
+            const audience = document.getElementById('audience').value;
+
+            fetch('/generate_report', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    instructions: instructions,
+                    tone: tone,
+                    length: length,
+                    industry: industry,
+                    audience: audience,
+                    download: false
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error generating report: ' + data.error);
+                } else {
+                    document.getElementById('content-output').value = data.generated_report || "No content generated.";
+                    document.getElementById('download-report').disabled = false; // Enable download button
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching the report:", error);
+                alert("There was an issue generating the report. Please try again.");
+            });
+        });
+
+        document.getElementById('download-report').addEventListener('click', function () {
+            const format = document.getElementById('format').value;
+
+            fetch('/download_report', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    content: document.getElementById('content-output').value,
+                    format: format
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const element = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                element.href = url;
+                element.download = format === 'pdf' ? 'generated_report.pdf' : 'generated_report.docx';
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
